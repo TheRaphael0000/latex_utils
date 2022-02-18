@@ -1,5 +1,11 @@
 import tempfile
 import subprocess
+import shutil
+
+LATEX_PROCESSOR = "latexmk"
+
+if not shutil.which(LATEX_PROCESSOR):
+    raise Exception(f"{LATEX_PROCESSOR} is not installed in global path")
 
 
 def tex_to_pdf(input_tex, capture_output=True):
@@ -9,7 +15,7 @@ def tex_to_pdf(input_tex, capture_output=True):
         with open(latex_filename, "w") as latex_file:
             latex_file.write(input_tex)
         subprocess.run(
-            ["latexmk", "-pdf", latex_filename],
+            [LATEX_PROCESSOR, "-pdf", latex_filename],
             capture_output=capture_output,
             check=True,
             cwd=tmpdir
