@@ -1,6 +1,8 @@
 import tempfile
 import subprocess
 import shutil
+import jinja2
+import os
 
 LATEX_PROCESSOR = "latexmk"
 
@@ -23,3 +25,18 @@ def tex_to_pdf(input_tex, capture_output=True):
         pdf_filename = f"{tmpfilename}.pdf"
         with open(pdf_filename, "rb") as pdf_file:
             return pdf_file.read()
+
+
+def render_latex(template_path, data):
+    latex_jinja_env = jinja2.Environment(
+        block_start_string=r"\BLOCK{", block_end_string="}",
+        variable_start_string=r"\VAR{", variable_end_string="}",
+        comment_start_string=r"\#{", comment_end_string="}",
+        line_statement_prefix="%-",
+        line_comment_prefix="%#",
+        trim_blocks=True,
+        autoescape=False,
+        loader=jinja2.FileSystemLoader(os.path.abspath("."))
+    )
+
+    return latex_jinja_env.get_template(template_path).render(**data)
