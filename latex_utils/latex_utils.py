@@ -1,23 +1,28 @@
 import tempfile
 import subprocess
 import shutil
-import jinja2
 import os
+import pathlib
 
-LATEX_PROCESSOR = "latexmk"
+import jinja2
+
+LATEX_PROCESSOR = "xelatex"
 
 if not shutil.which(LATEX_PROCESSOR):
     raise Exception(f"{LATEX_PROCESSOR} is not installed in global path")
 
 
-def tex_to_pdf(input_tex, capture_output=True):
+def tex_to_pdf(input_tex, extra_files=[], capture_output=True):
     with tempfile.TemporaryDirectory() as tmpdir:
         _, tmpfilename = tempfile.mkstemp(dir=tmpdir)
         latex_filename = f"{tmpfilename}.tex"
+        for f in extra_files:
+            f = pathlib.Path(f)
+            shutil.copyfile(f, tmpdir / f)
         with open(latex_filename, "w") as latex_file:
             latex_file.write(input_tex)
         subprocess.run(
-            [LATEX_PROCESSOR, "-pdf", latex_filename],
+            [LATEX_PROCESSOR, latex_filename],
             capture_output=capture_output,
             check=True,
             cwd=tmpdir
