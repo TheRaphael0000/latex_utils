@@ -1,3 +1,4 @@
+#!/bin/zsh
 import tempfile
 import subprocess
 import shutil
